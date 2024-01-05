@@ -83,7 +83,7 @@ namespace Zaliczenie.Tests
         }
 
         [TestMethod]
-        private async Task UpdatesMovie_ReturnsStatusCode()
+        public async Task UpdatesMovie_ReturnsStatusCode()
         {
             var updateModel = new
             {

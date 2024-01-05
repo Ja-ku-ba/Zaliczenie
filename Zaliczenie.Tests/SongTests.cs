@@ -83,7 +83,7 @@ namespace Zaliczenie.Tests
         }
 
         [TestMethod]
-        private async Task UpdatesSong_ReturnsStatusCode()
+        public async Task UpdatesSong_ReturnsStatusCode()
         {
             var updateModel = new {
                 author = "Krzysztof Krawczyk",
