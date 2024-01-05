@@ -3,12 +3,21 @@ import ModelContext from '../contex/ModelContext';
 
 const Select = () => {
   const { model, setModel } = useContext(ModelContext);
-  const [marked, setMarked] = useState([false, false]);
+  const [marked, setMarked] = useState([false, false]);       // [song, model], false means that none is selected
 
   const ifSelected = (e, idx) => {
     setModel(e.target.id);
     setMarked([idx === 0, idx === 1]);
   };
+  useEffect(() => {
+    if (model === "song") {
+      setMarked([true, false])
+    } else if (model === "movie") {
+      setMarked([false, true])
+    } else {
+      setMarked([false, false])
+    }
+  }, [model])
 
   return (
     <div>
