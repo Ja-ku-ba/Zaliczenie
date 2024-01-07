@@ -18,7 +18,7 @@ const Delete = () => {
 			}
 			getData()
 		} catch (error) {
-			console.log("Błąd podczas pobierania instanicji modelu: ", error)
+			console.error("Błąd podczas pobierania instanicji modelu: ", error)
 		}
 	}, [])
 
@@ -30,7 +30,7 @@ const Delete = () => {
 			if (response.ok) {
 				nav("/")
 			} else {
-				console.log("Coś poszło nie tak podczas łączności z serwerem")
+				console.error("Coś poszło nie tak podczas łączności z serwerem")
 			}
 		}	catch(error) {
 			console.error("Coś poszło nie tak: ", error)

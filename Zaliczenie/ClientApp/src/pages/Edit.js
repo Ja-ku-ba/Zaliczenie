@@ -10,11 +10,10 @@ const Edit = () => {
     var path = window.location.pathname.split("/");
     const [ art, setArt ] = useState({'relased':'1999-12-21'})      // this value exists because when page is loading, input="date" gets undefined, and throws error
     useEffect(() => {
-      console.log(model)
         fetch(`/${model}/${path[3]}`)
         .then(res => res.json())
         .then(d => setArt(d))
-        .catch(error => console.log("Something went wrong", error));
+        .catch(error => console.error("Something went wrong", error));
     }, []);
 
     async function upload(e) {
@@ -36,7 +35,7 @@ const Edit = () => {
           }
           
         } catch(error) {
-          console.log("Coś poszło nie tak: " + error)
+          console.error("Coś poszło nie tak: " + error)
         }
     }
 

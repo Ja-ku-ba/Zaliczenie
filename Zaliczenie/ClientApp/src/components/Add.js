@@ -28,7 +28,6 @@ const Add = () => {
   const upload = async (e) => {
     e.preventDefault()
     try {
-      console.log(art)
       const response = await fetch(`${model}`, {
         method: 'POST',
         body: JSON.stringify(art),
@@ -36,20 +35,16 @@ const Add = () => {
           'Content-Type': 'application/json'
         }
       });
-      console.log(2, response)
 
       if (!response.ok) {
-        console.log(3)
         alert('Nie dodano elementu, sprawdz połączenie z bazą danych');
       } else {
-        console.log(4)
         setUploaded(true)
         setFormSubmitted(true)
         // window.location.reload(false);
       }
-      console.log(5)
     } catch(error) {
-      console.log('Coś poszło nie tak: ' + error.message);
+      console.error('Coś poszło nie tak: ' + error.message);
     }
   };
 
