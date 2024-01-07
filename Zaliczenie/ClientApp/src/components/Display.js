@@ -49,7 +49,7 @@ const Display = () => {
 						<tr key={artData.id}>
 							<td>{artData.title}</td>
 							<td>{artData.author}</td>
-							<td>{artData.relased}</td>
+							<td>{artData.relased.slice(0,10)}</td>
 							<td>{artData.rating}</td>
 							<td><Link to={`/edit/${model}/${artData.id}`}>Edytuj</Link></td>
 							<td><Link to={`/delete/${model}/${artData.id}`}>Usuń</Link></td>

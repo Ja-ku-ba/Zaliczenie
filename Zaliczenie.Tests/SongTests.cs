@@ -2,37 +2,47 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using System.Text;
 using System.Net;
 using Newtonsoft.Json;
-using DnsClient;
+using System.Diagnostics;
 
 namespace Zaliczenie.Tests
 {
     [TestClass]
-    public class ApiTests
+    public class SongTests
     {
         private HttpClient _httpClient;
+        private string _id = "";
         private object _newElement = new
         {
             author = "Goran Bregoviæ i Krzysztof Krawczyk",
             id = "",
-            rating = "10",
-            relased = new DateTime(2003, 3, 2, 23, 0, 0),
+            rating = "8",
+            relased = new DateTime(2003, 3, 1, 10, 0, 0),
             title = "Mój przyjacielu"
         };
 
-        public ApiTests() { 
+        public SongTests()
+        {
             var webAppFactory = new WebApplicationFactory<Program>();
             _httpClient = webAppFactory.CreateDefaultClient();
         }
 
-        [TestMethod]
-        public async Task PostSong_ReturnsStatusCode_Created()
+        [TestInitialize]
+        public async Task TestInitialize()
         {
-
             var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(_newElement), Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("song", content);
+            Uri locationUri = response.Headers.Location;
+            string[] segments = locationUri.Segments;
+            string lastSegment = segments[segments.Length - 1];
+            _id = lastSegment.Trim('/');
+        }
 
-            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+
+        [TestMethod]
+        public async Task PostSong_ReturnsId_StatusCode()
+        {
+            Assert.AreNotEqual(null, _id);
         }
 
         public async Task<string> CompareSongs_ReturnsIdOrNull()
@@ -44,7 +54,6 @@ namespace Zaliczenie.Tests
                 new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
 
             dynamic dynamicElement = _newElement;
-
             foreach (var item in deserializedResponse)
             {
                 if ((string)item.title == (string)dynamicElement.title && (string)item.author == (string)dynamicElement.author)
@@ -55,28 +64,19 @@ namespace Zaliczenie.Tests
                     }
                 }
             }
-
             return null;
         }
 
-
         [TestMethod]
-        public async Task GetSong_CheksIfExists_ReturnsStatusCode_200Ok()
+        public async Task GetSongById_RetursStatusCode()
         {
-            var checkIfExists = CompareSongs_ReturnsIdOrNull();
-            Assert.AreNotEqual(checkIfExists, null);
-        }
-
-        [TestMethod]
-        public async Task GetSongById_ReturnsBool()
-        {
-            var getId = CompareSongs_ReturnsIdOrNull();
-            if (getId != null)
+            if (_id != null)
             {
-                var response = await _httpClient.GetAsync($"song/{getId}");
+                var response = await _httpClient.GetAsync($"song/{_id}");
 
-                Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
-            } else
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            }
+            else
             {
                 Assert.Fail("Utwór z podanymi kryteriami nie istnieje");
             }
@@ -85,35 +85,33 @@ namespace Zaliczenie.Tests
         [TestMethod]
         public async Task UpdatesSong_ReturnsStatusCode()
         {
-            var updateModel = new {
-                author = "Krzysztof Krawczyk",
-                id = "",
-                rating = "9",
-                relased = new DateTime(1976, 3, 2, 23, 0, 0),
-                title = "Parastatek"
+            var updateModel = new
+            {
+                author = "Maciej Maleñczuk & Sentino feat. Yugopolis",
+                rating = "7",
+                id = _id,
+                relased = new DateTime(2021, 12, 30, 23, 0, 0),
+                title = "Ostatnia nocka ale to DRILL"
             };
 
             var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(updateModel), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync("song", content);
+            var response = await _httpClient.PutAsync($"song/{_id}", content);
 
-            Assert.AreEqual(response.StatusCode, HttpStatusCode.NotFound);
+            Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
         }
 
         [TestMethod]
         public async Task DeleteSong_Returns()
         {
-            var getId = await CompareSongs_ReturnsIdOrNull();
-            if (getId != null)
-            {
-                var response = await _httpClient.DeleteAsync($"song/{getId}");
 
-                // Check if the deletion is successful
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            }
-            else
-            {
-                Assert.Fail("Utwór z danym id nie istnieje");
-            }
+            var response = await _httpClient.DeleteAsync($"song/{_id}");
+            Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
+        }
+
+        [TestCleanup]
+        public async Task TestCleanup()
+        {
+            await _httpClient.DeleteAsync($"song/{_id}");
         }
     }
 }

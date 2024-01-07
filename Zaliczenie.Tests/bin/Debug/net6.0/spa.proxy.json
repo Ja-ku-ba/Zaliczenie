@@ -1,8 +1,0 @@
-{
-"SpaProxyServer": {
-"ServerUrl": "http://localhost:44452",
-"LaunchCommand": "npm start",
-"WorkingDirectory": "C:\\Users\\jakub\\Desktop\\Zaliczenie\\Zaliczenie\\ClientApp\\",
-"MaxTimeoutInSeconds": "120"
-}
-}
