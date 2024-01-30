@@ -20,6 +20,6 @@ namespace Zaliczenie.Models
         public DateTime Relased { get; set; }
 
         [BsonElement("rating")]
-        public int Rating { get; set; }
+        public int? Rating { get; set; }
     }
 }

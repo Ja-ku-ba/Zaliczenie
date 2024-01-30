@@ -1,50 +1,50 @@
 import React, { useContext, useEffect, useState } from 'react';
-import ModelContext from '../contex/ModelContext';
+import DatabaseContext from '../contex/DatabaseContext';
 
-const Select = () => {
-  const { model, setModel } = useContext(ModelContext);
+const SelectDatabase = () => {
+  const { database, setDatabase } = useContext(DatabaseContext);
   const [marked, setMarked] = useState([false, false]);       // [song, model], false means that none is selected
 
   const ifSelected = (e, idx) => {
-    setModel(e.target.id);
+    setDatabase(e.target.id);
     setMarked([idx === 0, idx === 1]);
   };
   useEffect(() => {
-    if (model === "song") {
+    if (database === "mongo") {
       setMarked([true, false])
-    } else if (model === "movie") {
+    } else if (database === "mysql") {
       setMarked([false, true])
     } else {
       setMarked([false, false])
     }
-  }, [model])
+  }, [database])
 
   return (
     <div>
       <hr />
-      {model !== "" ? <span>Zmień model</span> : <span>Wybierz model</span>}
+      {database !== "" ? <span>Zmień bazę danych</span> : <span>Wybierz bazę danych</span>}
 
       <form>
         <input
-          id='song'
+          id='mongo'
           onChange={(e) => ifSelected(e, 0)}
-          name='art'
+          name='db'
           type='radio'
           checked={marked[0]}
         />
-        <label htmlFor='song'>Muzyka</label>
+        <label htmlFor='mongo'>Mongo</label>
         <br/>
         <input
-          id='movie'
+          id='mysql'
           onChange={(e) => ifSelected(e, 1)}
-          name='art'
+          name='db'
           type='radio'
           checked={marked[1]}
         />
-        <label htmlFor='movie'>Film</label>
+        <label htmlFor='mysql'>Mysql</label>
       </form>
     </div>
   );
 };
 
-export default Select;
+export default SelectDatabase;

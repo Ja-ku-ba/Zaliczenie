@@ -6,5 +6,6 @@
         public string DatabaseName { get; set; }
         public string SongCollection { get; set; }
         public string MovieCollection { get; set; }
+        public string MysqlConnectionString {  get; set; }
     }
 }

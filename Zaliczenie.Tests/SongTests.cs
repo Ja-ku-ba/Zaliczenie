@@ -31,7 +31,7 @@ namespace Zaliczenie.Tests
         {
             var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(_newElement), Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("song", content);
+            var response = await _httpClient.PostAsync("song/mongo", content);
             Uri locationUri = response.Headers.Location;
             string[] segments = locationUri.Segments;
             string lastSegment = segments[segments.Length - 1];
@@ -45,34 +45,12 @@ namespace Zaliczenie.Tests
             Assert.AreNotEqual(null, _id);
         }
 
-        public async Task<string> CompareSongs_ReturnsIdOrNull()
-        {
-            var response = await _httpClient.GetAsync("song");
-            var stringResult = await response.Content.ReadAsStringAsync();
-
-            var deserializedResponse = JsonConvert.DeserializeObject<List<dynamic>>(stringResult,
-                new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-
-            dynamic dynamicElement = _newElement;
-            foreach (var item in deserializedResponse)
-            {
-                if ((string)item.title == (string)dynamicElement.title && (string)item.author == (string)dynamicElement.author)
-                {
-                    if ((string)item.rating == (string)dynamicElement.rating)
-                    {
-                        return item.id;
-                    }
-                }
-            }
-            return null;
-        }
-
         [TestMethod]
         public async Task GetSongById_RetursStatusCode()
         {
             if (_id != null)
             {
-                var response = await _httpClient.GetAsync($"song/{_id}");
+                var response = await _httpClient.GetAsync($"song/mongo/{_id}");
 
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             }
@@ -95,7 +73,7 @@ namespace Zaliczenie.Tests
             };
 
             var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(updateModel), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync($"song/{_id}", content);
+            var response = await _httpClient.PutAsync($"song/mongo/{_id}", content);
 
             Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
         }
@@ -104,7 +82,7 @@ namespace Zaliczenie.Tests
         public async Task DeleteSong_Returns()
         {
 
-            var response = await _httpClient.DeleteAsync($"song/{_id}");
+            var response = await _httpClient.DeleteAsync($"song/mongo/{_id}");
             Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
         }
 

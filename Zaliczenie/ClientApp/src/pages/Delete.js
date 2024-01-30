@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-
+import DatabaseContext from '../contex/DatabaseContext'
 import ModelContext from '../contex/ModelContext'
 
 const Delete = () => {
     const { model } = useContext(ModelContext)
+    const { database } = useContext(DatabaseContext)
     const nav = useNavigate()
     var path = window.location.pathname.split("/")
     const [art, setArt] = useState({})
@@ -12,7 +13,7 @@ const Delete = () => {
     useEffect(() => {
 		try {
 			const getData = async () => {
-				const response = await fetch(`/${model}/${path[3]}`)
+				const response = await fetch(`/${model}/${database}/${path[3]}`)
 				const data = await response.json()
 				setArt(data)
 			}
@@ -24,7 +25,7 @@ const Delete = () => {
 
     const deleteElement = async () => {
 		try{
-			const response = await fetch(`/${model}/${art.id}`, {
+			const response = await fetch(`/${model}/${database}/${art.id}`, {
 				method: "DELETE"
 			})
 			if (response.ok) {

@@ -1,8 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react';
 import ModelContext from '../contex/ModelContext';
+import DatabaseContext from '../contex/DatabaseContext';
 
 const Add = () => {
   const { model, setModel, setUploaded } = useContext(ModelContext);
+  const { database } = useContext(DatabaseContext)
   const  [formSubmitted, setFormSubmitted] = useState(false)
 
   const [art, setArt] = useState({
@@ -19,6 +21,17 @@ const Add = () => {
       alert('Ocena musi zawierać się w przedziale 1-10');
       return;
     }
+
+    if (( name === 'author') && value.length > 254) {
+      alert("Przekroczono maksymalną liczbę znaków dla autora (254)");
+      return;
+    }
+    
+    if (( name === 'title') && value.length > 510) {
+      alert("Przekroczono maksymalną liczbę znaków dla tytułu (510)");
+      return;
+    } 
+    
     setArt(prevState => ({
       ...prevState,
       [name]: value
@@ -28,14 +41,13 @@ const Add = () => {
   const upload = async (e) => {
     e.preventDefault()
     try {
-      const response = await fetch(`${model}`, {
+      const response = await fetch(`${model}/${database}`, {
         method: 'POST',
         body: JSON.stringify(art),
         headers: {
           'Content-Type': 'application/json'
         }
       });
-
       if (!response.ok) {
         alert('Nie dodano elementu, sprawdz połączenie z bazą danych');
       } else {
@@ -67,10 +79,10 @@ const Add = () => {
       <span>Dodaj nowy element: </span>
       <form onSubmit={(e) => upload(e)}>
         <label htmlFor='name'>Tytuł: </label>
-        <input onChange={(e) => handleChange(e)} name='title' type='text' id='name' value={art.title} required/>
+        <input onChange={(e) => handleChange(e)} name='title' type='text' maxLength="510" id='name' value={art.title} required/>
 
         <label htmlFor='artist'>Twórca: </label>
-        <input onChange={(e) => handleChange(e)} type='text' id='artist' name='author' value={art.author} required/>
+        <input onChange={(e) => handleChange(e)} type='text' id='artist' maxLength="254" name='author' value={art.author} required/>
 
         <label htmlFor='relaseDate'>Data wydania: </label>
         <input onChange={(e) => handleChange(e)} name='relased' type='date' id='relaseDate' value={art.relased} required/>

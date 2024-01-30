@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Zaliczenie.Models;
 using Zaliczenie.Services;
 
@@ -17,18 +16,19 @@ namespace Zaliczenie.Controllers
         }
 
 
-        // GET: /movie
-        [HttpGet]
-        public async Task<List<MovieModel>> Get()
+        // GET: /movie/mongo or movie/mysql
+        [HttpGet("{database}")]
+        public async Task<List<MovieModel>> Get(string database)
         {
-            return await _movieService.GetAsync();
+            return await _movieService.GetAsync(database);
         }
 
-        // GET movie by id: /movie:65250242a1fc1c92c2d11459
-        [HttpGet("{id:length(24)}")]
-        public async Task<ActionResult<MovieModel>> Get(string id)
+        // GET movie by id: movie/mongo/65250242a1fc1c92c2d11459
+        // GET movie by id: movie/mysql/1
+        [HttpGet("{database}/{id}")]
+        public async Task<ActionResult<MovieModel>> Get(string database, string id)
         {
-            var movie = await _movieService.GetAsync(id);
+            var movie = await _movieService.GetAsync(database, id);
             if (movie == null)
             {
                 return NotFound();
@@ -36,37 +36,47 @@ namespace Zaliczenie.Controllers
             return movie;
         }
 
-        // POST: movie
-        [HttpPost]
-        public async Task<ActionResult<MovieModel>> Post(MovieModel newMovie)
+        // POST: movie/mongo
+        // POST: movie/mysql
+        [HttpPost("{database}")]
+        public async Task<ActionResult<MovieModel>> Post(string database, MovieModel newMovie)
         {
-            await _movieService.CreateAsync(newMovie);
-            return CreatedAtAction(nameof(Get), new { id = newMovie.Id }, newMovie);
+            var response = await _movieService.CreateAsync(database, newMovie);
+            if (database == "mongo")
+            {
+                return CreatedAtAction(nameof(Get), new { id = newMovie.Id }, newMovie);
+            }
+            else
+            {
+                return CreatedAtAction(nameof(Get), new { id = response }, newMovie);
+            }
         }
 
-        // PUT: movie/65250242a1fc1c92c2d11459
-        [HttpPut("{id:length(24)}")]
-        public async Task<ActionResult> Put(string id, MovieModel updateMovie)
+        // PUT: movie/mongo/65250242a1fc1c92c2d11459
+        // PUT: movie/mysql/1
+        [HttpPut("{database}/{id}")]
+        public async Task<ActionResult> Put(string database, string id, MovieModel updateMovie)
         {
-            MovieModel ifExists = await _movieService.GetAsync(id);
+            MovieModel ifExists = await _movieService.GetAsync(database, id);
             if (ifExists == null)
             {
                 return NotFound();
             }
-            await _movieService.UpdateAsync(id, updateMovie);
+            await _movieService.UpdateAsync(database, id, updateMovie);
             return Ok();
         }
 
-        // DELETE: movie/65250242a1fc1c92c2d11459
-        [HttpDelete("{id:length(24)}")]
-        public async Task<ActionResult> Delete(string id)
+        // DELETE: movie/mongo/65250242a1fc1c92c2d11459
+        // DELETE: movie/mysql/1
+        [HttpDelete("{database}/{id}")]
+        public async Task<ActionResult> Delete(string database, string id)
         {
-            MovieModel ifExists = await _movieService.GetAsync(id);
+            MovieModel ifExists = await _movieService.GetAsync(database, id);
             if (ifExists == null)
             {
                 return NotFound();
             }
-            await _movieService.DeleteAsync(id);
+            await _movieService.DeleteAsync(database, id);
             return Ok();
         }
     }

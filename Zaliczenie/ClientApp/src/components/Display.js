@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { Link } from 'react-router-dom'
-
+import { Link, json } from 'react-router-dom'
+import DatabaseContext from '../contex/DatabaseContext'
 import ModelContext from '../contex/ModelContext'
 
 const Display = () => {
     const { model, uploaded, setUploaded } = useContext(ModelContext)
+    const { database } = useContext(DatabaseContext)
     const [data, setData] = useState("")
     const [responseStatus, setResponseStatus] = useState(false)
 
@@ -12,7 +13,7 @@ const Display = () => {
       setData("")
         const getData = async () => {
             try {
-                const response = await fetch(`${model}`)
+                const response = await fetch(`${model}/${database}`)
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
@@ -26,7 +27,7 @@ const Display = () => {
         };
     
         getData();
-      }, [model, uploaded]);
+      }, [model, database, uploaded]);
 
 	return (
     <div>

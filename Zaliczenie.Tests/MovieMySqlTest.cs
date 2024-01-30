@@ -7,7 +7,7 @@ using System.Diagnostics;
 namespace Zaliczenie.Tests
 {
     [TestClass]
-    public class MovieTests
+    public class MovieMySqlTests
     {
         private HttpClient _httpClient;
         private string _id = "";
@@ -20,7 +20,7 @@ namespace Zaliczenie.Tests
             title = "OJCIEC CHRZESTNY"
         };
 
-        public MovieTests()
+        public MovieMySqlTests()
         {
             var webAppFactory = new WebApplicationFactory<Program>();
             _httpClient = webAppFactory.CreateDefaultClient();
@@ -31,7 +31,7 @@ namespace Zaliczenie.Tests
         {
             var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(_newElement), Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("movie/mongo", content);
+            var response = await _httpClient.PostAsync("movie/mysql", content);
             Uri locationUri = response.Headers.Location;
             string[] segments = locationUri.Segments;
             string lastSegment = segments[segments.Length - 1];
@@ -50,8 +50,7 @@ namespace Zaliczenie.Tests
         {
             if (_id != null)
             {
-                var response = await _httpClient.GetAsync($"movie/mongo/{_id}");
-
+                var response = await _httpClient.GetAsync($"movie/mysql/{_id}");
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             }
             else
@@ -73,22 +72,22 @@ namespace Zaliczenie.Tests
             };
 
             var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(updateModel), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync($"movie/mongo/{_id}", content);
+            var response = await _httpClient.PutAsync($"movie/mysql/{_id}", content);
 
-            Assert.AreEqual(response.StatusCode, HttpStatusCode.OK );
+            Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
         }
 
         [TestMethod]
         public async Task DeleteMovie_Returns()
         {
-            var response = await _httpClient.DeleteAsync($"movie/mongo/{_id}");
+            var response = await _httpClient.DeleteAsync($"movie/mysql/{_id}");
             Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
         }
 
         [TestCleanup]
         public async Task TestCleanup()
         {
-            await _httpClient.DeleteAsync($"movie/mongo/{_id}");
+            await _httpClient.DeleteAsync($"movie/mysql/{_id}");
         }
     }
 }

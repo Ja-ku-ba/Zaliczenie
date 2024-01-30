@@ -1,4 +1,4 @@
-ï»¿using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Mvc.Testing;
 using System.Text;
 using System.Net;
 using Newtonsoft.Json;
@@ -7,20 +7,20 @@ using System.Diagnostics;
 namespace Zaliczenie.Tests
 {
     [TestClass]
-    public class MovieTests
+    public class SongMySqlTests
     {
         private HttpClient _httpClient;
         private string _id = "";
         private object _newElement = new
         {
-            author = "Francis Ford Coppola",
+            author = "Goran Bregoviæ i Krzysztof Krawczyk",
             id = "",
-            rating = "9",
-            relased = new DateTime(1972, 3, 14, 10, 0, 0),
-            title = "OJCIEC CHRZESTNY"
+            rating = "8",
+            relased = new DateTime(2003, 3, 1, 10, 0, 0),
+            title = "Mój przyjacielu"
         };
 
-        public MovieTests()
+        public SongMySqlTests()
         {
             var webAppFactory = new WebApplicationFactory<Program>();
             _httpClient = webAppFactory.CreateDefaultClient();
@@ -31,64 +31,66 @@ namespace Zaliczenie.Tests
         {
             var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(_newElement), Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("movie/mongo", content);
+            var response = await _httpClient.PostAsync("song/mysql", content);
             Uri locationUri = response.Headers.Location;
             string[] segments = locationUri.Segments;
             string lastSegment = segments[segments.Length - 1];
             _id = lastSegment.Trim('/');
+            Debug.WriteLine($"{_id} UGINREWOIUG43094JGNRINHOE SONG");
         }
 
 
         [TestMethod]
-        public async Task PostMovie_ReturnsId_StatusCode()
+        public async Task PostSong_ReturnsId_StatusCode()
         {
             Assert.AreNotEqual(null, _id);
         }
 
         [TestMethod]
-        public async Task GetMovieById_RetursStatusCode()
+        public async Task GetSongById_RetursStatusCode()
         {
             if (_id != null)
             {
-                var response = await _httpClient.GetAsync($"movie/mongo/{_id}");
+                var response = await _httpClient.GetAsync($"song/mysql/{_id}");
 
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             }
             else
             {
-                Assert.Fail("UtwÃ³r z podanymi kryteriami nie istnieje");
+                Assert.Fail("Utwór z podanymi kryteriami nie istnieje");
             }
         }
 
         [TestMethod]
-        public async Task UpdatesMovie_ReturnsStatusCode()
+        public async Task UpdatesSong_ReturnsStatusCode()
         {
             var updateModel = new
             {
-                author = "Krzysztof Krawczyk",
-                rating = "9",
+                author = "Maciej Maleñczuk & Sentino feat. Yugopolis",
+                rating = "7",
                 id = _id,
-                relased = new DateTime(1976, 3, 2, 23, 0, 0),
-                title = "Akademia Pana Kleksa"
+                relased = new DateTime(2021, 12, 30, 23, 0, 0),
+                title = "Ostatnia nocka ale to DRILL"
             };
 
             var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(updateModel), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync($"movie/mongo/{_id}", content);
+            var response = await _httpClient.PutAsync($"song/mysql/{_id}", content);
 
-            Assert.AreEqual(response.StatusCode, HttpStatusCode.OK );
+            Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
         }
 
         [TestMethod]
-        public async Task DeleteMovie_Returns()
+        public async Task DeleteSong_Returns()
         {
-            var response = await _httpClient.DeleteAsync($"movie/mongo/{_id}");
+
+            var response = await _httpClient.DeleteAsync($"song/mysql/{_id}");
             Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
         }
 
         [TestCleanup]
         public async Task TestCleanup()
         {
-            await _httpClient.DeleteAsync($"movie/mongo/{_id}");
+            await _httpClient.DeleteAsync($"song/{_id}");
         }
     }
 }
